@@ -2,6 +2,8 @@ import 'package:colorman/widgets/cards/ModeCard.dart';
 import 'package:colorman/widgets/color/ColorHomePage.dart';
 import 'package:flutter/material.dart';
 
+import 'widgets/math/CountingWidget.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -20,7 +22,7 @@ class HomePage extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<HomePage>{
+class _HomeState extends State<HomePage> {
   final List<Mode> modes = [
     Mode('Color Man', Icons.access_alarm, Colors.blue),
     Mode('Math King', Icons.camera_alt, Colors.green),
@@ -49,12 +51,23 @@ class _HomeState extends State<HomePage>{
           ),
           itemCount: modes.length,
           itemBuilder: (BuildContext context, int index) {
-            return ModeCard(mode: modes[index], onClick: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ColorHomePage(title: "Color Man")),
-              );
-            },);
+            return ModeCard(
+              mode: modes[index],
+              onClick: () {
+                var materialPageRoute;
+                if (index == 0) {
+                  materialPageRoute = MaterialPageRoute(
+                      builder: (context) => ColorHomePage(title: "Color Man"));
+                } else {
+                  materialPageRoute = MaterialPageRoute(
+                      builder: (context) => CountingWidget());
+                }
+                Navigator.push(
+                  context,
+                  materialPageRoute,
+                );
+              },
+            );
           },
         ),
       ),
