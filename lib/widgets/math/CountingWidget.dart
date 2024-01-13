@@ -16,6 +16,9 @@ class CountingWidget extends StatelessWidget {
 }
 
 class CountingView extends StatelessWidget {
+
+  final confettiController = ConfettiController();
+
   @override
   Widget build(BuildContext context) {
     final NumberBloc countingBloc = BlocProvider.of<NumberBloc>(context);
@@ -58,6 +61,11 @@ class CountingView extends StatelessWidget {
             },
           ),
         ),
+        ConfettiWidget(
+          confettiController: confettiController,
+          shouldLoop: false,
+          blastDirectionality: BlastDirectionality.explosive,
+        ),
       ]),
     );
   }
@@ -72,11 +80,13 @@ class CountingView extends StatelessWidget {
               onPressed: () {
                 if (value == numbers["S"]!.first) {
                   textToSpeech.speak("Das ist richtig!");
+                  confettiController.play();
                 } else {
                   textToSpeech.speak("Das war leider nichts!");
                 }
-                Future.delayed(Duration(seconds: 1), () {
+                Future.delayed(Duration(seconds: 2), () {
                   countingBloc.add(NumberPressedEvent());
+                  confettiController.stop();
                 });
               },
               child: Text(
