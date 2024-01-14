@@ -79,10 +79,10 @@ class CountingView extends StatelessWidget {
               style: ElevatedButton.styleFrom(padding: EdgeInsets.all(50.0)),
               onPressed: () {
                 if (value == numbers["S"]!.first) {
-                  textToSpeech.speak("Das ist richtig!");
+                  textToSpeech.speak("${value} Das ist richtig!");
                   confettiController.play();
                 } else {
-                  textToSpeech.speak("Das war leider nichts!");
+                  textToSpeech.speak("${value} Das war leider nichts!");
                 }
                 Future.delayed(Duration(seconds: 2), () {
                   countingBloc.add(NumberPressedEvent());

@@ -47,18 +47,25 @@ class _MyWidgetState extends State<ColorHomePage> {
       setState(() {
         isConfetti = true;
         confettiController.play();
-        final random = Random();
-        int randomNumber = random.nextInt(3) + 1;
-        _counter += randomNumber;
+        Future.delayed(Duration(seconds: 2), () {
+          final random = Random();
+          int randomNumber = random.nextInt(3) + 1;
+          _counter += randomNumber;
+          confettiController.stop();
+          _speakText();
+        });
       });
     } else {
       textToSpeech.speak("Leider falsch");
       setState(() {
         isConfetti = false;
         confettiController.stop();
-        final random = Random();
-        int randomNumber = random.nextInt(3) + 1;
-        _counter += randomNumber;
+        Future.delayed(Duration(seconds: 2), (){
+          final random = Random();
+          int randomNumber = random.nextInt(3) + 1;
+          _counter += randomNumber;
+          _speakText();
+        });
       });
     }
   }
