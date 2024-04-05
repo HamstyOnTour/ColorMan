@@ -1,5 +1,6 @@
 import 'package:colorman/widgets/cards/ModeCard.dart';
 import 'package:colorman/widgets/color/ColorHomePage.dart';
+import 'package:colorman/widgets/math/sums/Sums.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/math/CountingWidget.dart';
@@ -25,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomeState extends State<HomePage> {
   final List<Mode> modes = [
     Mode('Color Man', Icons.access_alarm, Colors.blue),
+    Mode('Summen König', Icons.numbers, Colors.teal),
     Mode('Math King', Icons.camera_alt, Colors.green),
   ];
 
@@ -58,9 +60,11 @@ class _HomeState extends State<HomePage> {
                 if (index == 0) {
                   materialPageRoute = MaterialPageRoute(
                       builder: (context) => ColorHomePage(title: "Color Man"));
+                } else if (index == 1) {
+                  materialPageRoute = MaterialPageRoute(builder: (context) => SumsWidget());
                 } else {
-                  materialPageRoute = MaterialPageRoute(
-                      builder: (context) => CountingWidget());
+                  materialPageRoute =
+                      MaterialPageRoute(builder: (context) => CountingWidget());
                 }
                 Navigator.push(
                   context,
