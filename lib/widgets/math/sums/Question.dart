@@ -8,7 +8,7 @@ class QuestionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
+      width: 180,
       height: 60,
       decoration: BoxDecoration(
         color: Colors.blue,
