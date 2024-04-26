@@ -6,23 +6,34 @@ class NumberEvent {}
 
 class NumberPressedEvent extends NumberEvent {}
 
-class SumsBloc extends Bloc<NumberEvent, Map<String, String>> {
+class SumData{
+  final int num1;
+  final int num2;
+
+  SumData(this.num1, this.num2);
+
+  String getQuestion(){
+    return '$num1 + $num2 = ?';
+  }
+
+  int getAnswer(){
+    return num1 + num2;
+  }
+
+  String getOperator() {
+    return "+";
+  }
+}
+
+class SumsBloc extends Bloc<NumberEvent, SumData> {
   int listLength = 5;
 
-  SumsBloc() : super({"Q": " 1 + 1 = ?",
-    "A": "2"}) {
+  SumsBloc() : super(SumData(1,1)) {
     on<NumberPressedEvent>((event, emit) {
       Random random = Random();
-      int num1 = random.nextInt(10) + 1; // Random number between 1 and 20
+      int num1 = random.nextInt(7) + 1;
       int num2 = random.nextInt(5) + 1;
-      int sum = num1 + num2;
-      String question = '$num1 + $num2 = ?';
-      String answer = sum.toString();
-      Map<String, String> emitted = {
-        "Q": question,
-        "A": answer
-      };
-      emit(emitted);
+      emit(SumData(num1, num2));
     });
   }
 }

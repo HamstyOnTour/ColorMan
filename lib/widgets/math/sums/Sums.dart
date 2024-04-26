@@ -2,13 +2,12 @@ import 'package:colorman/widgets/TextToSpeech.dart';
 import 'package:colorman/widgets/math/sums/Question.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'event/SumsBloc.dart';
 
 class SumsWidget extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -41,19 +40,55 @@ class CalculatorView extends StatelessWidget {
               appBar: AppBar(
                 title: Text('Summen'),
               ),
-              body: BlocBuilder<SumsBloc, Map<String, String>>(
+              body: BlocBuilder<SumsBloc, SumData>(
                 builder: (context, numbers) {
                   return Column(children: [
                     SizedBox(
-                        child: QuestionTile(question: numbers["Q"])),
+                        child: QuestionTile(question: numbers.getQuestion())),
+                    SizedBox(height: 20),
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      ...List.generate(
+                        numbers.num1,
+                        (index) => Container(
+                          margin: EdgeInsets.all(4),
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        numbers.getOperator(),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ...List.generate(
+                        numbers.num2,
+                        (index) => Container(
+                          margin: EdgeInsets.all(4),
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                    ]),
                     SizedBox(height: 20),
                     TextFormField(
                       controller: textEditingController,
                       keyboardType: TextInputType.number,
                       autofocus: true,
                       focusNode: inputNode,
+                      inputFormatters:[FilteringTextInputFormatter.digitsOnly],
                       onFieldSubmitted: (value) {
-                        if (value == numbers["A"]!) {
+                        if (numbers.getAnswer() == int.parse(value)) {
                           textToSpeech.speak("${value} Das ist richtig!");
                           confettiController.play();
                         } else {
@@ -66,10 +101,8 @@ class CalculatorView extends StatelessWidget {
                           openKeyboard();
                         });
                       },
-                      decoration: InputDecoration(
-                          hintText: "Lösung"
-                      ),
-                    )
+                      decoration: InputDecoration(hintText: "Lösung"),
+                    ),
                   ]);
                 },
               ),
