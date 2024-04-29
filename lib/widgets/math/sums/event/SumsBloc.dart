@@ -31,7 +31,7 @@ class SumsBloc extends Bloc<NumberEvent, SumData> {
   SumsBloc() : super(SumData(1,1)) {
     on<NumberPressedEvent>((event, emit) {
       Random random = Random();
-      int num1 = random.nextInt(7) + 1;
+      int num1 = random.nextInt(6) + 1;
       int num2 = random.nextInt(5) + 1;
       emit(SumData(num1, num2));
     });
