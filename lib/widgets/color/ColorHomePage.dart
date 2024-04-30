@@ -1,137 +1,120 @@
-import 'dart:math';
-
 import 'package:colorman/widgets/TextToSpeech.dart';
+import 'package:colorman/widgets/color/event/ColorEvent.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'ColoredBoxWidget.dart';
+import 'widget/ImageWidget.dart';
 
-class ColorHomePage extends StatefulWidget {
-
-  const ColorHomePage({super.key, required this.title});
-
-  final String title;
+class ColorHomePage extends StatelessWidget {
   @override
-  _MyWidgetState createState() => _MyWidgetState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => ColorBloc(),
+      child: ColorView(),
+    );
+  }
 }
 
-class _MyWidgetState extends State<ColorHomePage> {
-  int _counter = 0;
-  TextToSpeech textToSpeech = TextToSpeech();
-  bool isConfetti = false;
+class ColorView extends StatelessWidget {
+  final TextToSpeech textToSpeech = TextToSpeech();
   final confettiController = ConfettiController();
+  bool _isProcessing = false;
 
-  void _speakText() {
-    if (isConfetti) {
-      confettiController.stop();
+  void _checkSelection(int state, ColorBloc bloc) {
+    if (!_isProcessing) {
+      _isProcessing = true;
+    } else {
+      return;
     }
-    String text;
-    switch (_counter % 3) {
-      case 0:
-        text = "Blau";
-        break;
-      case 1:
-        text = "Rot";
-        break;
-      case 2:
-      default:
-        text = "Grün";
-    }
-    textToSpeech.speak(text);
-  }
-
-  void _checkSelection(int state) {
-    if (state == _counter % 3) {
+    if (state == bloc.state.solutionIndex % 3) {
       textToSpeech.speak("RICHTIG");
-      setState(() {
-        isConfetti = true;
-        confettiController.play();
-        Future.delayed(Duration(seconds: 2), () {
-          final random = Random();
-          int randomNumber = random.nextInt(3) + 1;
-          _counter += randomNumber;
-          confettiController.stop();
-          _speakText();
-        });
-      });
+      confettiController.play();
     } else {
       textToSpeech.speak("Leider falsch");
-      setState(() {
-        isConfetti = false;
-        confettiController.stop();
-        Future.delayed(Duration(seconds: 2), (){
-          final random = Random();
-          int randomNumber = random.nextInt(3) + 1;
-          _counter += randomNumber;
-          _speakText();
-        });
-      });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    confettiController.addListener(() {
-      setState(() {
-        isConfetti =
-            confettiController.state == ConfettiControllerState.playing;
-      });
+    Future.delayed(Duration(seconds: 2), () {
+      _isProcessing = false;
+      bloc.add(ColorPressedEvent());
+      confettiController.stop();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(alignment: Alignment.center, children: [
-      Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Theme
-              .of(context)
-              .colorScheme
-              .inversePrimary,
-          title: Text(widget.title),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ColoredBoxWidget(
-                color: Colors.blue,
-                text: "BLAU",
-                onClick: () {
-                  _checkSelection(0);
-                },
+    final ColorBloc colorBloc = BlocProvider.of<ColorBloc>(context);
+    return BlocProvider(
+        create: (context) => colorBloc,
+        child: Stack(alignment: Alignment.center, children: [
+          Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                title: Text("Farben"),
               ),
-              ColoredBoxWidget(
-                color: Colors.red,
-                text: "ROT",
-                onClick: () {
-                  _checkSelection(1);
-                },
-              ),
-              ColoredBoxWidget(
-                color: Colors.green,
-                text: "GRÜN",
-                onClick: () {
-                  _checkSelection(2);
-                },
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _speakText,
-          tooltip: 'Color',
-          child: const Icon(Icons.add_box_outlined),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
-      ),
-      ConfettiWidget(
-        confettiController: confettiController,
-        shouldLoop: false,
-        blastDirectionality: BlastDirectionality.explosive,
-      )
-    ]);
+              body: BlocBuilder<ColorBloc, ColorSelection>(
+                  builder: (context, selection) {
+                textToSpeech
+                    .speak("Welcher Dino ist ${colorBloc.state.colorText}?");
+                return Stack(alignment: Alignment.center, children: [
+                  SingleChildScrollView(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          ImageWidget(
+                            imagePath: colorBloc.state.getImage(0),
+                            text: "BLAU",
+                            height: 200,
+                            width: 200,
+                            onClick: () {
+                              _checkSelection(0, colorBloc);
+                            },
+                          ),
+                          ImageWidget(
+                            imagePath: colorBloc.state.getImage(1),
+                            text: "ROT",
+                            height: 200,
+                            width: 200,
+                            onClick: () {
+                              _checkSelection(1, colorBloc);
+                            },
+                          ),
+                          ImageWidget(
+                            imagePath: colorBloc.state.getImage(2),
+                            text: "GRÜN",
+                            height: 200,
+                            width: 200,
+                            onClick: () {
+                              _checkSelection(2, colorBloc);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: FloatingActionButton(
+                      onPressed: () async {
+                        textToSpeech.speak(colorBloc.state.colorText);
+                      },
+                      tooltip: 'Color',
+                      backgroundColor: Colors.amber,
+                      child: const Icon(Icons.speaker),
+                    ),
+                    // This trailing comma makes auto-formatting nicer for build methods.
+                  ),
+                  ConfettiWidget(
+                    confettiController: confettiController,
+                    shouldLoop: false,
+                    blastDirectionality: BlastDirectionality.explosive,
+                  )
+                ]);
+              })),
+        ]));
   }
 }

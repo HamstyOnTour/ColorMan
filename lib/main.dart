@@ -38,7 +38,7 @@ class _HomeState extends State<HomePage> {
     return MaterialApp(
       title: 'ColorMan',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
       home: Scaffold(
@@ -58,8 +58,7 @@ class _HomeState extends State<HomePage> {
               onClick: () {
                 var materialPageRoute;
                 if (index == 0) {
-                  materialPageRoute = MaterialPageRoute(
-                      builder: (context) => ColorHomePage(title: "Color Man"));
+                  materialPageRoute = MaterialPageRoute(builder: (context) => ColorHomePage());
                 } else if (index == 1) {
                   materialPageRoute = MaterialPageRoute(builder: (context) => SumsWidget());
                 } else {
