@@ -43,13 +43,20 @@ class ColorSelection {
       'images/brontosaurusGreen.jpeg',
       'images/triceratopsBlue.jpeg',
       'images/triceratopsRed.jpeg',
-      'images/triceratopsGreen.jpeg'
+      'images/triceratopsGreen.jpeg',
+      'images/mosasaurusBlue.jpeg',
+      'images/mosasaurusRed.jpeg',
+      'images/mosasaurusGreen.jpeg',
+      'images/brontosaurusBlue2.jpeg',
+      'images/brontosaurusRed2.jpeg',
+      'images/brontosaurusGreen2.jpeg'
     ];
+
     _dinos++;
   }
 
   String getImage(int position) {
-    return _images[position + 3 * (_dinos % 3)];
+    return _images[position + 3 * (_dinos % (_images.length / 3).round())];
   }
 
   int get solutionIndex => _solutionIndex;
