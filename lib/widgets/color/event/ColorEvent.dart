@@ -1,58 +1,75 @@
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ColorEvent {}
 
 class ColorPressedEvent extends ColorEvent {}
 
+class SwitchAnimationStateEvent extends ColorEvent {
+}
+
 class ColorBloc extends Bloc<ColorEvent, ColorSelection> {
-  ColorBloc() : super(ColorSelection(1)) {
+  ColorBloc()
+      : super(ColorSelection(
+            colorText: getColorText(1), solutionIndex: 1, confettiState: ConfettiState.inactive)) {
     on<ColorPressedEvent>((event, emit) {
       final random = Random();
       int randomNumber = random.nextInt(3) + 1;
-      emit(ColorSelection(randomNumber));
+      emit(state.copyWith(solutionIndex: randomNumber, colorText: getColorText(randomNumber), dinos: state.dinos + 1));
+    });
+    on<SwitchAnimationStateEvent>((event, emit) {
+      emit(state.copyWith(confettiState: state.confettiState.getOther()));
     });
   }
 }
 
-class ColorSelection {
-  String _colorText = "";
+class ColorSelection extends Equatable {
+  final String _colorText;
   final int _solutionIndex;
-  static int _dinos = 0;
-  List<String> _images = [];
+  final ConfettiState _confettiState;
+  final int _dinos;
+  static final List<String> _images = [
+    'images/blueTRex.jpeg',
+    'images/redTRex.jpeg',
+    'images/greenTRex.jpeg',
+    'images/brontosaurusBlue.jpeg',
+    'images/brontosaurusRed.jpeg',
+    'images/brontosaurusGreen.jpeg',
+    'images/triceratopsBlue.jpeg',
+    'images/triceratopsRed.jpeg',
+    'images/triceratopsGreen.jpeg',
+    'images/mosasaurusBlue.jpeg',
+    'images/mosasaurusRed.jpeg',
+    'images/mosasaurusGreen.jpeg',
+    'images/brontosaurusBlue2.jpeg',
+    'images/brontosaurusRed2.jpeg',
+    'images/brontosaurusGreen2.jpeg'
+  ];
 
-  ColorSelection(this._solutionIndex) {
-    switch (_solutionIndex % 3) {
-      case 0:
-        _colorText = "Blau";
-        break;
-      case 1:
-        _colorText = "Rot";
-        break;
-      case 2:
-      default:
-        _colorText = "Grün";
-    }
-    _images = [
-      'images/blueTRex.jpeg',
-      'images/redTRex.jpeg',
-      'images/greenTRex.jpeg',
-      'images/brontosaurusBlue.jpeg',
-      'images/brontosaurusRed.jpeg',
-      'images/brontosaurusGreen.jpeg',
-      'images/triceratopsBlue.jpeg',
-      'images/triceratopsRed.jpeg',
-      'images/triceratopsGreen.jpeg',
-      'images/mosasaurusBlue.jpeg',
-      'images/mosasaurusRed.jpeg',
-      'images/mosasaurusGreen.jpeg',
-      'images/brontosaurusBlue2.jpeg',
-      'images/brontosaurusRed2.jpeg',
-      'images/brontosaurusGreen2.jpeg'
-    ];
+  const ColorSelection({
+    required String colorText,
+    required int solutionIndex,
+    required ConfettiState confettiState,
+    int? dinos,
+  })  : _colorText = colorText,
+        _solutionIndex = solutionIndex,
+        _confettiState = confettiState,
+        _dinos = dinos ?? 0;
 
-    _dinos++;
+  ColorSelection copyWith({
+    String? colorText,
+    int? solutionIndex,
+    ConfettiState? confettiState,
+    int? dinos,
+  }) {
+    return ColorSelection(
+      colorText: colorText ?? _colorText,
+      solutionIndex: solutionIndex ?? _solutionIndex,
+      confettiState: confettiState ?? _confettiState,
+      dinos: dinos ?? _dinos,
+    );
   }
 
   String getImage(int position) {
@@ -62,4 +79,32 @@ class ColorSelection {
   int get solutionIndex => _solutionIndex;
 
   String get colorText => _colorText;
+
+  ConfettiState get confettiState => _confettiState;
+
+  int get dinos => _dinos;
+
+  @override
+  List<Object> get props => [_colorText, _confettiState, _solutionIndex, _dinos];
+}
+
+String getColorText(int solutionIndex) {
+  switch (solutionIndex % 3) {
+    case 0:
+      return "Blau";
+    case 1:
+      return "Rot";
+    case 2:
+    default:
+      return "Grün";
+  }
+}
+
+enum ConfettiState {
+  active,
+  inactive;
+
+  ConfettiState getOther() {
+    return this == ConfettiState.active ? ConfettiState.inactive : ConfettiState.active;
+  }
 }

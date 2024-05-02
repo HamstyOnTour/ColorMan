@@ -29,15 +29,17 @@ class ColorView extends StatelessWidget {
       return;
     }
     if (state == bloc.state.solutionIndex % 3) {
-      textToSpeech.speak("RICHTIG");
       confettiController.play();
+      bloc.add(SwitchAnimationStateEvent());
+      textToSpeech.speak("RICHTIG");
     } else {
       textToSpeech.speak("Leider falsch");
     }
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _isProcessing = false;
-      bloc.add(ColorPressedEvent());
       confettiController.stop();
+      bloc.add(ColorPressedEvent());
+      bloc.add(SwitchAnimationStateEvent());
     });
   }
 
@@ -45,76 +47,90 @@ class ColorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorBloc colorBloc = BlocProvider.of<ColorBloc>(context);
     return BlocProvider(
-        create: (context) => colorBloc,
-        child: Stack(alignment: Alignment.center, children: [
+      create: (context) => colorBloc,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
           Scaffold(
-              backgroundColor: Colors.black,
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text("Farben"),
-              ),
-              body: BlocBuilder<ColorBloc, ColorSelection>(
-                  builder: (context, selection) {
-                textToSpeech
-                    .speak("Welcher Dino ist ${colorBloc.state.colorText}?");
-                return Stack(alignment: Alignment.center, children: [
-                  SingleChildScrollView(
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          ImageWidget(
-                            imagePath: colorBloc.state.getImage(0),
-                            text: "BLAU",
-                            height: 200,
-                            width: 200,
-                            onClick: () {
-                              _checkSelection(0, colorBloc);
-                            },
-                          ),
-                          ImageWidget(
-                            imagePath: colorBloc.state.getImage(1),
-                            text: "ROT",
-                            height: 200,
-                            width: 200,
-                            onClick: () {
-                              _checkSelection(1, colorBloc);
-                            },
-                          ),
-                          ImageWidget(
-                            imagePath: colorBloc.state.getImage(2),
-                            text: "GRÜN",
-                            height: 200,
-                            width: 200,
-                            onClick: () {
-                              _checkSelection(2, colorBloc);
-                            },
-                          ),
-                        ],
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: Text("Farben"),
+            ),
+            body: Stack(
+              alignment: Alignment.center,
+              children: [
+                BlocBuilder<ColorBloc, ColorSelection>(
+                  buildWhen: (prevState, state) => prevState.dinos != state.dinos,
+                  builder: (context, state) {
+                    textToSpeech.speak("Welcher Dino ist ${colorBloc.state.colorText}?");
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            ImageWidget(
+                              imagePath: colorBloc.state.getImage(0),
+                              text: "BLAU",
+                              height: 200,
+                              width: 200,
+                              onClick: () {
+                                _checkSelection(0, colorBloc);
+                              },
+                            ),
+                            ImageWidget(
+                              imagePath: colorBloc.state.getImage(1),
+                              text: "ROT",
+                              height: 200,
+                              width: 200,
+                              onClick: () {
+                                _checkSelection(1, colorBloc);
+                              },
+                            ),
+                            ImageWidget(
+                              imagePath: colorBloc.state.getImage(2),
+                              text: "GRÜN",
+                              height: 200,
+                              width: 200,
+                              onClick: () {
+                                _checkSelection(2, colorBloc);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    );
+                  },
+                ),
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      textToSpeech.speak(colorBloc.state.colorText);
+                    },
+                    tooltip: 'Color',
+                    backgroundColor: Colors.amber,
+                    child: const Icon(Icons.speaker),
                   ),
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: FloatingActionButton(
-                      onPressed: () async {
-                        textToSpeech.speak(colorBloc.state.colorText);
-                      },
-                      tooltip: 'Color',
-                      backgroundColor: Colors.amber,
-                      child: const Icon(Icons.speaker),
-                    ),
-                    // This trailing comma makes auto-formatting nicer for build methods.
-                  ),
-                  ConfettiWidget(
-                    confettiController: confettiController,
-                    shouldLoop: false,
-                    blastDirectionality: BlastDirectionality.explosive,
-                  )
-                ]);
-              })),
-        ]));
+                  // This trailing comma makes auto-formatting nicer for build methods.
+                ),
+                BlocBuilder<ColorBloc, ColorSelection>(
+                  buildWhen: (prevState, state) => prevState.confettiState != state.confettiState,
+                  builder: (context, state) {
+                    return ConfettiWidget(
+                      confettiController: confettiController,
+                      shouldLoop: false,
+                      blastDirectionality: BlastDirectionality.explosive,
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
