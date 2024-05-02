@@ -91,6 +91,10 @@ class CalculatorView extends StatelessWidget {
                         controller: textEditingController,
                         keyboardType: TextInputType.number,
                         autofocus: true,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 30,
+                        ),
                         focusNode: inputNode,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
