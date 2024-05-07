@@ -54,49 +54,36 @@ class ColorView extends StatelessWidget {
           Scaffold(
             backgroundColor: Colors.black,
             appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              backgroundColor: Theme
+                  .of(context)
+                  .colorScheme
+                  .inversePrimary,
               title: Text("Farben"),
             ),
             body: Stack(
               alignment: Alignment.center,
               children: [
                 BlocBuilder<ColorBloc, ColorSelection>(
-                  buildWhen: (prevState, state) => prevState.dinos != state.dinos,
+                  buildWhen: (prevState, state) =>
+                  prevState.dinos != state.dinos,
                   builder: (context, state) {
-                    textToSpeech.speak("Welcher Dino ist ${colorBloc.state.colorText}?");
+                    textToSpeech.speak(
+                        "Welcher Dino ist ${colorBloc.state.colorText}?");
                     return SingleChildScrollView(
                       padding: EdgeInsets.only(top: 20.0),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            ImageWidget(
-                              imagePath: colorBloc.state.getImage(0),
-                              text: "BLAU",
-                              height: 200,
-                              width: 200,
-                              onClick: () {
-                                _checkSelection(0, colorBloc);
-                              },
-                            ),
-                            ImageWidget(
-                              imagePath: colorBloc.state.getImage(1),
-                              text: "ROT",
-                              height: 200,
-                              width: 200,
-                              onClick: () {
-                                _checkSelection(1, colorBloc);
-                              },
-                            ),
-                            ImageWidget(
-                              imagePath: colorBloc.state.getImage(2),
-                              text: "GRÜN",
-                              height: 200,
-                              width: 200,
-                              onClick: () {
-                                _checkSelection(2, colorBloc);
-                              },
-                            ),
+                            _buildImageWidget(
+                                colorBloc.state.getImage(0), "BLAU", 0,
+                                colorBloc),
+                            _buildImageWidget(
+                                colorBloc.state.getImage(1), "ROT", 1,
+                                colorBloc),
+                            _buildImageWidget(
+                                colorBloc.state.getImage(2), "GRÜN", 2,
+                                colorBloc),
                           ],
                         ),
                       ),
@@ -117,7 +104,8 @@ class ColorView extends StatelessWidget {
                   // This trailing comma makes auto-formatting nicer for build methods.
                 ),
                 BlocBuilder<ColorBloc, ColorSelection>(
-                  buildWhen: (prevState, state) => prevState.confettiState != state.confettiState,
+                  buildWhen: (prevState, state) =>
+                  prevState.confettiState != state.confettiState,
                   builder: (context, state) {
                     return ConfettiWidget(
                       confettiController: confettiController,
@@ -131,6 +119,19 @@ class ColorView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageWidget(String imagePath, String text, int index,
+      ColorBloc colorBloc) {
+    return ImageWidget(
+      imagePath: imagePath,
+      text: text,
+      height: 200,
+      width: 200,
+      onClick: () {
+        _checkSelection(index, colorBloc);
+      },
     );
   }
 }
