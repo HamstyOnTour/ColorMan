@@ -50,40 +50,21 @@ class CalculatorView extends StatelessWidget {
                         alignment: WrapAlignment.center,
                         spacing: 8,
                         runSpacing: 8,
-                        children: [
-                          ...List.generate(
-                            numbers.num1,
-                            (index) => Container(
-                              margin: EdgeInsets.all(4),
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                          Text(
-                            numbers.getOperator(),
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          ...List.generate(
-                            numbers.num2,
-                            (index) => Container(
-                              margin: EdgeInsets.all(4),
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                        ]),
+                        children:
+                            _generateNumberContainers(numbers.num1, Colors.blue)
+                              ..addAll([
+                                Text(
+                                  numbers.getOperator(),
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ])
+                      ..addAll(_generateNumberContainers(
+                          numbers.num2, Colors.green)),
+                  ),
                     SizedBox(height: 20),
                     Container(
                       margin: EdgeInsets.all(24),
@@ -128,5 +109,20 @@ class CalculatorView extends StatelessWidget {
             ),
           ],
         ));
+  }
+
+  List<Widget> _generateNumberContainers(int count, Color color) {
+    return List.generate(
+      count,
+      (index) => Container(
+        margin: EdgeInsets.all(4),
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+    );
   }
 }
